@@ -5,6 +5,7 @@ from time import sleep
 from Ram_memory import *
 import keyboard
 from option import *
+from control import send_command, target_for_color
 
 
 
@@ -69,47 +70,49 @@ try:
         if keyboard.is_pressed('g') or keyboard.is_pressed('y'):
             color = "Green" if keyboard.is_pressed('g') else "Yellow"
             coordinates = read_ram("manipulator_coordinates")
-            print(coordinates[color][0], coordinates[color][1])
-            x = coordinates[color][0]
-            y = coordinates[color][1]
+            target = target_for_color(coordinates, color)
 
-            if x != None or y != None:
-                z = 15
+            if target is None:
+                print(f"No {color.lower()} ball detected; no command sent.")
+                sleep(0.2)
+                continue
 
+            x, y = target
+            print(x, y)
+            z = 15
 
-
-                angles_for_robot = move_to_position_cart(x, y, z + 200)
-                command = f"{angles_for_robot[0]} {angles_for_robot[1]} {angles_for_robot[2]} 65 {angles_for_robot[3]} 75"
-                ser.write(command.encode())
-                print(f"Sent command: {command}")
-                sleep(2)
-                angles_for_robot = move_to_position_cart(x, y, z)
-                command = f"{angles_for_robot[0]} {angles_for_robot[1]} {angles_for_robot[2]} 65 {angles_for_robot[3]} 75"
-                ser.write(command.encode())
-                print(f"Sent command: {command}")
-                sleep(2)
-                command = f"{angles_for_robot[0]} {angles_for_robot[1]} {angles_for_robot[2]} 65 {angles_for_robot[3]} 0"
-                ser.write(command.encode())
-                print(f"Sent command: {command}")
-                sleep(2)
-                angles_for_robot = move_to_position_cart(-200, 0, 300)
-                command = f"{angles_for_robot[0] - 5} {angles_for_robot[1]} {angles_for_robot[2]} 65 {angles_for_robot[3]} 0"
-                ser.write(command.encode())
-                print(f"Sent command: {command}")
-                sleep(2)
-                angles_for_robot = move_to_position_cart(-200, 0, 50)
-                command = f"{angles_for_robot[0] - 5} {angles_for_robot[1]} {angles_for_robot[2]} 65 {angles_for_robot[3]} 0"
-                ser.write(command.encode())
-                print(f"Sent command: {command}")
-                sleep(2)
-                angles_for_robot = move_to_position_cart(-200, 0, 50)
-                command = f"{angles_for_robot[0] - 5} {angles_for_robot[1]} {angles_for_robot[2]} 65 {angles_for_robot[3]} 75"
-                ser.write(command.encode())
-                print(f"Sent command: {command}")
-                sleep(1)
-                command = f"{0} {90} {90} 65 {90} 75" #agle for hand
-                ser.write(command.encode())
-                print(f"Sent command: {command}")
+            angles_for_robot = move_to_position_cart(x, y, z + 200)
+            command = f"{angles_for_robot[0]} {angles_for_robot[1]} {angles_for_robot[2]} 65 {angles_for_robot[3]} 75"
+            send_command(ser, command)
+            print(f"Sent command: {command}")
+            sleep(2)
+            angles_for_robot = move_to_position_cart(x, y, z)
+            command = f"{angles_for_robot[0]} {angles_for_robot[1]} {angles_for_robot[2]} 65 {angles_for_robot[3]} 75"
+            send_command(ser, command)
+            print(f"Sent command: {command}")
+            sleep(2)
+            command = f"{angles_for_robot[0]} {angles_for_robot[1]} {angles_for_robot[2]} 65 {angles_for_robot[3]} 0"
+            send_command(ser, command)
+            print(f"Sent command: {command}")
+            sleep(2)
+            angles_for_robot = move_to_position_cart(-200, 0, 300)
+            command = f"{angles_for_robot[0] - 5} {angles_for_robot[1]} {angles_for_robot[2]} 65 {angles_for_robot[3]} 0"
+            send_command(ser, command)
+            print(f"Sent command: {command}")
+            sleep(2)
+            angles_for_robot = move_to_position_cart(-200, 0, 50)
+            command = f"{angles_for_robot[0] - 5} {angles_for_robot[1]} {angles_for_robot[2]} 65 {angles_for_robot[3]} 0"
+            send_command(ser, command)
+            print(f"Sent command: {command}")
+            sleep(2)
+            angles_for_robot = move_to_position_cart(-200, 0, 50)
+            command = f"{angles_for_robot[0] - 5} {angles_for_robot[1]} {angles_for_robot[2]} 65 {angles_for_robot[3]} 75"
+            send_command(ser, command)
+            print(f"Sent command: {command}")
+            sleep(1)
+            command = f"{0} {90} {90} 65 {90} 75" #agle for hand
+            send_command(ser, command)
+            print(f"Sent command: {command}")
 
 
 except serial.SerialException as se:
